@@ -163,5 +163,17 @@
       <p class="rating">★★★★☆ <span>Đã bán 172</span></p>
       <button class="buy-btn">Mua ngay trên Shopee</button>
     </a>
+
+  <!-- Auto-height for iframe embedding -->
+  <script>
+  function sendHeightToParent() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
+  }
+
+  window.addEventListener("load", sendHeightToParent);
+  window.addEventListener("resize", sendHeightToParent);
+</script>
+
   </div>
 </div>
