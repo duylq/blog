@@ -55,7 +55,7 @@ body {
   .product-card h3 {
     font-size: 13px;
     margin: 8px 0 4px;
-    height: 35px;
+    height: 30px;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
