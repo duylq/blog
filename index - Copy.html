@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Danh sách Sản phẩm</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .carousel-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+	  -webkit-overflow-scrolling: touch;
+      gap: 10px;
+      padding: 10px 0;
+    }
+    .product-card {
+      flex: 0 0 auto;
+      width: 240px;
+      scroll-snap-align: start;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-title {
+		font-size: 13px;
+		margin: 8px 0 4px;
+		height: 35px;
+		overflow: hidden;					  
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+    }
+    .product-rating {
+      font-size: 13px;
+      color: #f5a623;
+      margin: 2px 0 4px;
+    }
+    .product-price {
+      margin: 4px 0;
+    }
+    .original-price {
+      text-decoration: line-through;
+      color: #888;
+    }
+    .discounted-price {
+		color: red;
+		font-weight: bold;
+		font-size: 16px;
+		margin-left: 6px;
+    }
+    .buy-button {
+      margin-top: 8px;
+      background-color: #ee4d2d;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel-container" id="productContainer">
+    <!-- Sản phẩm sẽ được tạo từ JS -->
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("category") || "";
+
+    const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
+
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(item => item.category?.toLowerCase() === category.toLowerCase());
+        const container = document.getElementById("productContainer");
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${category}"</p>`;
+          return;
+        }
+
+        filtered.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "product-card";
+          card.innerHTML = `
+            <img class="product-image" src="${item.image}" alt="${item.name}" />
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+			  <div class="product-rating">★★★★★ ${item.rating} | Đã bán: ${item.sold}</div>
+              <div class="product-price">
+                <div class="original-price">${item.originalPrice || ""}</div>
+                <div class="discounted-price">${item.price}</div>
+              </div>
+              <a href="${item.link}" class="buy-button" target="_blank">Mua trên Shopee</a>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        sendHeightToParent(); // sau khi render
+      });
+
+    // Tự động điều chỉnh chiều cao iframe
+    function sendHeightToParent() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "setIframeHeight", height: height }, "*");
+    }
+
+    window.addEventListener("load", sendHeightToParent);
+    window.addEventListener("resize", sendHeightToParent);
+  </script>
+</body>
+</html>
