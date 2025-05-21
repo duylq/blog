@@ -130,10 +130,10 @@
             <div class="product-info">
               <div class="product-title">${item.name}</div>
 			  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-              <div class="product-price">
-                <div class="original-price">${item.originalPrice || ""}</div>
-                <div class="discounted-price">${item.price}</div>
-              </div>
+              <p class="product-price">
+                <span class="original-price">${item.originalPrice}</span>
+                <span class="discounted-price">${item.price}</span>
+              </p>
               <a href="${item.link}" class="buy-button" target="_blank">Mua trên Shopee</a>
             </div>
           `;
@@ -142,6 +142,11 @@
 
         sendHeightToParent(); // sau khi render
       });
+	
+	//<div class="product-price">
+                //<div class="original-price">${item.originalPrice || ""}</div>
+                //<div class="discounted-price">${item.price}</div>
+              //</div>
 
     // Tự động điều chỉnh chiều cao iframe
     function sendHeightToParent() {
