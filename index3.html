@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Danh sách sản phẩm</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+    }
+    .carousel-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 16px;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 16px;
+    }
+    .product-card {
+      scroll-snap-align: start;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 240px;
+      flex: 0 0 auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .product-title {
+      font-weight: bold;
+      font-size: 14px;
+      height: 34px;
+      overflow: hidden;
+    }
+    .product-rating {
+      color: #f9a825;
+      font-size: 13px;
+    }
+    .product-price {
+      margin-top: auto;
+    }
+    .original-price {
+      text-decoration: line-through;
+      font-size: 13px;
+      color: #888;
+    }
+    .discounted-price {
+      font-size: 16px;
+      font-weight: bold;
+      color: #d32f2f;
+    }
+    .buy-button {
+      margin-top: 8px;
+      background-color: #f1582c;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Danh sách sản phẩm</h2>
+  <div class="carousel-container" id="product-list"></div>
+
+  <script>
+    const sheetURL = "https://opensheet.elk.sh/2PACX-1vSv1wduIhactiufv-KbMp67TFpuCzQigikW3w2rUsxeRtJam-hSEPdbIKQk3QSlK19Z_Fx6WHvOnTrT/Products";
+
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function createProductCard(product) {
+      return `
+        <div class="product-card">
+          <img class="product-image" src="${product.image}" alt="${product.name}">
+          <div class="product-info">
+            <div class="product-title">${product.name}</div>
+            <div class="product-rating">★ ${product.rating} | Đã bán: ${product.sold}</div>
+            <div class="product-price">
+              <div class="original-price">${product.originalPrice}</div>
+              <div class="discounted-price">${product.price}</div>
+            </div>
+            <a class="buy-button" href="${product.link}" target="_blank">Mua ngay</a>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadProducts() {
+      const category = getQueryParam("category");
+      const res = await fetch(sheetURL);
+      const data = await res.json();
+      const filtered = category ? data.filter(p => p.category.toLowerCase() === category.toLowerCase()) : data;
+      document.getElementById("product-list").innerHTML = filtered.map(createProductCard).join("");
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
