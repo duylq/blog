@@ -31,6 +31,11 @@
 	  background: #fff;
     }
 	
+	.product-card a {
+	  tex-decoration: none;
+	  color: inherit;
+	}
+	
     .product-image-wrapper {
       width: 100%;
 	  padding-top: 100%;
@@ -104,7 +109,6 @@
       text-align: center;
 	  font-size: 14px;
       cursor: pointer;
-	  text-decoration: none;
     }
 	
 	@media screen and (max-width: 600px) {
@@ -156,18 +160,20 @@
           const card = document.createElement("div");
           card.className = "product-card";
           card.innerHTML = `
-            <div class="product-image-wrapper">
-				<img src="${item.image}" alt="${item.name}" />
-			</div>
-            <div class="product-info">
-              <div class="product-title">${item.name}</div>
-			  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-              <p class="product-price">
-                <span class="original-price">${item.originalPrice}</span>
-                <span class="discounted-price">${item.price}</span>
-              </p>
-              <a href="${item.link}" class="buy-button" target="_blank">Mua trên Shopee</a>
-            </div>
+            <a href="${item.link}" target="_blank">
+				<div class="product-image-wrapper">
+					<img src="${item.image}" alt="${item.name}" />
+				</div>
+				<div class="product-info">
+				  <div class="product-title">${item.name}</div>
+				  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+				  <p class="product-price">
+					<span class="original-price">${item.originalPrice}</span>
+					<span class="discounted-price">${item.price}</span>
+				  </p>
+				  <button class="buy-button">Mua trên Shopee</button>
+				</div>
+			</a>	
           `;
           container.appendChild(card);
         });
