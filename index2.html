@@ -37,7 +37,7 @@
       flex-direction: column;
     }
     .product-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       line-height: 1.2;
       overflow: hidden;
@@ -106,7 +106,8 @@
             <img class="product-image" src="${item.image}" alt="${item.name}" />
             <div class="product-info">
               <div class="product-title">${item.name}</div>
-              <div class="product-rating">${item.rating || '★★★★★'} | Đã bán: ${item.sold || '0'}</div>
+              //<div class="product-rating">${item.rating || '★★★★★'} | Đã bán: ${item.sold || '0'}</div>
+			  <div class="product-rating">★★★★★ ${item.rating | Đã bán: ${item.sold}</div>
               <div class="product-price">
                 <div class="original-price">${item.originalPrice || ""}</div>
                 <div class="discounted-price">${item.price}</div>
