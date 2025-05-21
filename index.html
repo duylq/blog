@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Danh sách Sản phẩm</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Danh sách Sản phẩm</title>
+<style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -135,69 +136,89 @@
   </style>
 </head>
 <body>
-	<div class="carousel-container" id="productContainer">
-		<!-- Sản phẩm sẽ được tạo từ JS -->
-	</div>
-	<script>
-	  const params = new URLSearchParams(window.location.search);
-	  const categoryParam = params.get("category") || "";
-	  const selectedCategories = categoryParam
-		.split(",")
-		.map(c => c.trim().toLowerCase())
-		.filter(c => c); // loại bỏ chuỗi rỗng nếu có
+<div class="carousel-container" id="productContainer">
+<!-- Sản phẩm sẽ được tạo từ JS -->
+</div>
 
-	  const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
 
-	  fetch(SHEET_URL)
-		.then(res => res.json())
-		.then(data => {
-		  const filtered = data.filter(item => {
-			const cat = item.category?.toLowerCase();
-			return selectedCategories.length === 0 || selectedCategories.includes(cat);
-		  });
+<!-- Google tag (gtag.js) -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-RZNZVL9VP9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RZNZVL9VP9');
+</script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const categoryParam = params.get("category") || "";
+  const selectedCategories = categoryParam
+    .split(",")
+    .map(c => c.trim().toLowerCase())
+    .filter(c => c);
 
-		  const container = document.getElementById("productContainer");
+  const mainCategory = selectedCategories[0] || "unknown";
 
-		  if (filtered.length === 0) {
-			window.parent.postMessage({ type: "noProducts" }, "*");
-			container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${categoryParam}"</p>`;
-			return;
-		  }
+  const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
 
-		  filtered.forEach(item => {
-			const card = document.createElement("div");
-			card.className = "product-card";
-			card.innerHTML = `
-			  <a href="${item.link}" target="_blank">
-				<div class="product-image-wrapper">
-				  <img src="${item.image}" alt="${item.name}" />
-				</div>
-				<div class="product-info">
-				  <div class="product-title">${item.name}</div>
-				  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-				  <p class="product-price">
-					<span class="original-price">${item.originalPrice}</span>
-					<span class="discounted-price">${item.price}</span>
-				  </p>
-				  <button class="buy-button">Mua trên Shopee</button>
-				</div>
-			  </a>
-			`;
-			container.appendChild(card);
-		  });
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.filter(item => {
+        const cat = item.category?.toLowerCase();
+        return selectedCategories.length === 0 || selectedCategories.includes(cat);
+      });
 
-		  sendHeightToParent(); // cập nhật chiều cao iframe
-		});
+      const container = document.getElementById("productContainer");
 
-	  // Tự động điều chỉnh chiều cao iframe
-	  function sendHeightToParent() {
-		const height = document.body.scrollHeight;
-		parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
-	  }
+      if (filtered.length === 0) {
+        window.parent.postMessage({ type: "noProducts" }, "*");
+        container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${categoryParam}"</p>`;
+        return;
+      }
 
-	  window.addEventListener("load", sendHeightToParent);
-	  window.addEventListener("resize", sendHeightToParent);
-	</script>
-  
+      filtered.forEach(item => {
+        const utmLink = `${item.link}?utm_source=blog&utm_medium=mars-home&utm_campaign=${encodeURIComponent(mainCategory)}`;
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <a href="${utmLink}" target="_blank" class="buy-link">
+            <div class="product-image-wrapper">
+              <img src="${item.image}" alt="${item.name}" />
+            </div>
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+              <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+              <p class="product-price">
+                <span class="original-price">${item.originalPrice}</span>
+                <span class="discounted-price">${item.price}</span>
+              </p>
+              <button class="buy-button">Mua trên Shopee</button>
+            </div>
+          </a>
+        `;
+
+        card.querySelector(".buy-link").addEventListener("click", function () {
+          gtag('event', 'click_mua_ngay', {
+            event_category: 'button',
+            event_label: mainCategory,
+            value: 1
+          });
+        });
+
+        container.appendChild(card);
+      });
+
+      sendHeightToParent();
+    });
+
+  function sendHeightToParent() {
+    const height = document.body.scrollHeight;
+    parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
+  }
+
+  window.addEventListener("load", sendHeightToParent);
+  window.addEventListener("resize", sendHeightToParent);
+</script>
 </body>
 </html>
