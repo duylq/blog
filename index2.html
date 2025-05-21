@@ -1,136 +1,133 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title> 2 Danh sách sản phẩm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sản phẩm</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 1rem;
-      background-color: #f9f9f9;
+      font-family: Arial, sans-serif;
     }
     .carousel-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 16px;
+      padding: 16px;
     }
     .product-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      flex: 0 0 auto;
+      width: 240px;
+      scroll-snap-align: start;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
     }
     .product-image {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      height: 160px;
-      object-fit: contain;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
     }
     .product-title {
-      font-size: 1rem;
+      font-size: 14px;
       font-weight: bold;
-      margin: 0.5rem 0;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
     .product-rating {
-      color: #f39c12;
-      font-size: 0.9rem;
-    }
-    .product-sold {
-      font-size: 0.85rem;
-      color: #777;
-      margin: 0.25rem 0;
+      font-size: 13px;
+      color: #f9a825;
+      margin: 4px 0;
     }
     .product-price {
-      margin: 0.5rem 0;
+      margin-top: auto;
     }
     .original-price {
       text-decoration: line-through;
-      color: #999;
-      font-size: 0.85rem;
+      font-size: 13px;
+      color: #888;
     }
     .discounted-price {
-      color: #e74c3c;
-      font-size: 1rem;
+      font-size: 16px;
       font-weight: bold;
+      color: #d32f2f;
     }
     .buy-button {
-      background-color: #ee4d2d;
+      margin-top: 8px;
+      background-color: #f1582c;
       color: white;
-      padding: 0.5rem 1rem;
       border: none;
-      border-radius: 6px;
-      margin-top: 0.5rem;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
       text-decoration: none;
-      display: inline-block;
-      font-size: 0.9rem;
-    }
-    .buy-button:hover {
-      background-color: #d44123;
     }
   </style>
 </head>
 <body>
-  <div class="carousel-container">
-    <!-- Products will be injected here -->
+  <div class="carousel-container" id="productContainer">
+    <!-- Sản phẩm sẽ được tạo từ JS -->
   </div>
 
   <script>
-    const SHEET_URL = 'https://opensheet.elk.sh/1vSv1wduIhactiufv-KbMp67TFpuCzQigikW3w2rUsxeRtJam-hSEPdbIKQk3QSlK19Z_Fx6WHvOnTrT/Sheet1';
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("category") || "";
 
-    function getCategoryFromURL() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('category')?.toLowerCase() || '';
+    const SHEET_URL = "https://opensheet.elk.sh/2PACX-1vSv1wduIhactiufv-KbMp67TFpuCzQigikW3w2rUsxeRtJam-hSEPdbIKQk3QSlK19Z_Fx6WHvOnTrT/Sheet1";
+
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(item => item.category?.toLowerCase() === category.toLowerCase());
+        const container = document.getElementById("productContainer");
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${category}"</p>`;
+          return;
+        }
+
+        filtered.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "product-card";
+          card.innerHTML = `
+            <img class="product-image" src="${item.image}" alt="${item.name}" />
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+              <div class="product-rating">${item.rating || '★★★★★'} | Đã bán: ${item.sold || '0'}</div>
+              <div class="product-price">
+                <div class="original-price">${item.originalPrice || ""}</div>
+                <div class="discounted-price">${item.price}</div>
+              </div>
+              <a href="${item.link}" class="buy-button" target="_blank">Mua ngay</a>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        sendHeightToParent(); // sau khi render
+      });
+
+    // Tự động điều chỉnh chiều cao iframe
+    function sendHeightToParent() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "setIframeHeight", height: height }, "*");
     }
 
-    function createProductCard(product) {
-      const ratingStars = '★'.repeat(Math.round(product.rating || 0));
-      const soldText = product.sold ? `Đã bán ${product.sold}` : '';
-
-      return `
-        <div class="product-card">
-          <img class="product-image" src="${product.image}" alt="${product.name}">
-          <div class="product-title">${product.name}</div>
-          <div class="product-rating">${ratingStars}</div>
-          <div class="product-sold">${soldText}</div>
-          <div class="product-price">
-            <div class="original-price">${Number(product.originalPrice).toLocaleString()}₫</div>
-            <div class="discounted-price">${Number(product.price).toLocaleString()}₫</div>
-          </div>
-          <a href="${product.link}" class="buy-button" target="_blank">Mua ngay</a>
-        </div>
-      `;
-    }
-
-    async function renderProducts() {
-      try {
-        const res = await fetch(SHEET_URL);
-        const products = await res.json();
-        const category = getCategoryFromURL();
-
-        const filtered = products.filter(p =>
-          (p.category || '').toLowerCase() === category
-        );
-
-        const container = document.querySelector('.carousel-container');
-        container.innerHTML = filtered.map(createProductCard).join('');
-
-        // Gửi chiều cao iframe về parent (nếu có nhúng)
-        setTimeout(() => {
-          parent.postMessage({ type: "setIframeHeight", height: document.body.scrollHeight }, "*");
-        }, 300);
-      } catch (e) {
-        console.error("Lỗi khi tải sản phẩm:", e);
-      }
-    }
-
-    renderProducts();
+    window.addEventListener("load", sendHeightToParent);
+    window.addEventListener("resize", sendHeightToParent);
   </script>
 </body>
 </html>
