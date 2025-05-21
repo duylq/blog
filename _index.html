@@ -151,20 +151,9 @@
 	  fetch(SHEET_URL)
 		.then(res => res.json())
 		.then(data => {
-		  
-      function slugify(str) {
-        return str
-          .toLowerCase()
-          .normalize("NFD").replace(/[̀-ͯ]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "");
-      }
-
-      const filtered = data.filter(item => {
-        const itemCatSlug = slugify(item.category || "");
-    
+		  const filtered = data.filter(item => {
 			const cat = item.category?.toLowerCase();
-			return selectedCategories.length === 0 || selectedCategories.includes(itemCatSlug);
+			return selectedCategories.length === 0 || selectedCategories.includes(cat);
 		  });
 
 		  const container = document.getElementById("productContainer");
