@@ -93,9 +93,31 @@
       padding: 8px;
       border-radius: 4px;
       text-align: center;
+	  font-size: 14px;
       cursor: pointer;
-      text-decoration: none;
     }
+	
+	@media screen and (max-width: 600px) {
+    .product-card {
+      width: 180px;
+      max-height: none;
+      height: auto;
+      padding: 8px;
+    }
+
+    .product-title {
+      font-size: 13px;
+    }
+
+    .discount-price {
+      font-size: 14px;
+    }
+																									  																	 
+    .buy-button {
+      font-size: 13px;
+    }
+  }
+	
   </style>
 </head>
 <body>
@@ -143,12 +165,6 @@
         sendHeightToParent(); // sau khi render
       });
 	
-	//<div class="product-price">
-                //<div class="original-price">${item.originalPrice || ""}</div>
-                //<div class="discounted-price">${item.price}</div>
-              //</div>
-
-    // Tự động điều chỉnh chiều cao iframe
     function sendHeightToParent() {
       const height = document.body.scrollHeight;
       parent.postMessage({ type: "setIframeHeight", height: height }, "*");
