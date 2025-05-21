@@ -151,14 +151,9 @@
 	  fetch(SHEET_URL)
 		.then(res => res.json())
 		.then(data => {
-		  
-      
-
-      const filtered = data.filter(item => {
-        const itemCategory = (item.category || '').trim();
-    
+		  const filtered = data.filter(item => {
 			const cat = item.category?.toLowerCase();
-			return selectedCategories.length === 0 || selectedCategories.includes(itemCategory);
+			return selectedCategories.length === 0 || selectedCategories.includes(cat);
 		  });
 
 		  const container = document.getElementById("productContainer");
