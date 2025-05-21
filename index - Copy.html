@@ -51,6 +51,13 @@
       color: #f5a623;
       margin: 2px 0 4px;
     }
+	
+	.product-rating span {
+      color: #555;
+	  font-size: 12px;
+      margin-left: 6px;
+    }
+	
     .product-price {
       margin: 4px 0;
     }
@@ -106,7 +113,7 @@
             <img class="product-image" src="${item.image}" alt="${item.name}" />
             <div class="product-info">
               <div class="product-title">${item.name}</div>
-			  <div class="product-rating">★★★★★ ${item.rating} | Đã bán: ${item.sold}</div>
+			  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán: ${item.sold}</span></div>
               <div class="product-price">
                 <div class="original-price">${item.originalPrice || ""}</div>
                 <div class="discounted-price">${item.price}</div>
