@@ -152,13 +152,19 @@
 		.then(res => res.json())
 		.then(data => {
 		  
-      
+      function slugify(str) {
+        return str
+          .toLowerCase()
+          .normalize("NFD").replace(/[̀-ͯ]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+      }
 
       const filtered = data.filter(item => {
-        const itemCategory = (item.category || '').trim();
+        const itemCatSlug = slugify(item.category || "");
     
 			const cat = item.category?.toLowerCase();
-			return selectedCategories.length === 0 || selectedCategories.includes(itemCategory);
+			return selectedCategories.length === 0 || selectedCategories.includes(itemCatSlug);
 		  });
 
 		  const container = document.getElementById("productContainer");
