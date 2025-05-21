@@ -160,19 +160,20 @@
           const card = document.createElement("div");
           card.className = "product-card";
           card.innerHTML = `
-            <a href="${item.link}" target="_blank"></a>
-			<div class="product-image-wrapper">
-				<img src="${item.image}" alt="${item.name}" />
-			</div>
-            <div class="product-info">
-              <div class="product-title">${item.name}</div>
-			  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-              <p class="product-price">
-                <span class="original-price">${item.originalPrice}</span>
-                <span class="discounted-price">${item.price}</span>
-              </p>
-              <button class="buy-button">Mua trên Shopee</button>
-            </div>
+            <a href="${item.link}" target="_blank">
+				<div class="product-image-wrapper">
+					<img src="${item.image}" alt="${item.name}" />
+				</div>
+				<div class="product-info">
+				  <div class="product-title">${item.name}</div>
+				  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+				  <p class="product-price">
+					<span class="original-price">${item.originalPrice}</span>
+					<span class="discounted-price">${item.price}</span>
+				  </p>
+				  <button class="buy-button">Mua trên Shopee</button>
+				</div>
+			</a>	
           `;
           container.appendChild(card);
         });
