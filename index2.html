@@ -181,9 +181,10 @@
         sendHeightToParent(); // sau khi render
       });
 	
+	// Tự động điều chỉnh chiều cao iframe
     function sendHeightToParent() {
       const height = document.body.scrollHeight;
-      parent.postMessage({ type: "setIframeHeight", height: height }, "*");
+      parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
     }
 
     window.addEventListener("load", sendHeightToParent);
