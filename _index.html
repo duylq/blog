@@ -159,7 +159,6 @@
 		  const container = document.getElementById("productContainer");
 
 		  if (filtered.length === 0) {
-			window.parent.postMessage({ type: "noProducts" }, "*");
 			container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${categoryParam}"</p>`;
 			return;
 		  }
