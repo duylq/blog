@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh mục sản phẩm</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .carousel-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      gap: 16px;
+      padding: 16px;
+    }
+    .product-card {
+      flex: 0 0 auto;
+      width: 240px;
+      scroll-snap-align: start;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+    }
+    .product-info {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .product-title {
+      font-size: 14px;
+      font-weight: bold;
+      height: 30px;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 4px;
+    }
+    .product-rating {
+      font-size: 13px;
+      color: #f9a825;
+      margin-bottom: 4px;
+    }
+    .product-price {
+      margin-top: auto;
+    }
+    .original-price {
+      text-decoration: line-through;
+      font-size: 13px;
+      color: #888;
+    }
+    .discounted-price {
+      font-size: 16px;
+      font-weight: bold;
+      color: #d32f2f;
+    }
+    .buy-button {
+      margin-top: 8px;
+      background-color: #f1582c;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel-container" id="product-list"></div>
+
+  <script>
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSv1wduIhactiufv-KbMp67TFpuCzQigikW3w2rUsxeRtJam-hSEPdbIKQk3QSlK19Z_Fx6WHvOnTrT/pub?output=csv";
+
+    function getCategoryFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("category") || "";
+    }
+
+    function sendHeightToParent() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "setIframeHeight", height: height }, "*");
+    }
+
+    function createProductCard(product) {
+      return `
+        <div class="product-card">
+          <img class="product-image" src="${product.image}" alt="${product.title}" />
+          <div class="product-info">
+            <div class="product-title">${product.title}</div>
+            <div class="product-rating">${product.rating}</div>
+            <div class="product-price">
+              <div class="original-price">${product.originalPrice}</div>
+              <div class="discounted-price">${product.discountedPrice}</div>
+            </div>
+            <a href="${product.link}" class="buy-button" target="_blank">Mua ngay trên Shopee</a>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadProducts() {
+      const category = getCategoryFromURL().toLowerCase();
+      const response = await fetch(SHEET_URL);
+      const csv = await response.text();
+      const rows = csv.split("\n").slice(1);
+
+      const products = rows.map(row => {
+        const [title, image, rating, originalPrice, discountedPrice, link, cat] = row.split(",");
+        return { title, image, rating, originalPrice, discountedPrice, link, category: cat.trim().toLowerCase() };
+      }).filter(p => p.category === category);
+
+      document.getElementById("product-list").innerHTML = products.map(createProductCard).join("");
+      sendHeightToParent();
+    }
+
+    window.addEventListener("load", loadProducts);
+    window.addEventListener("resize", sendHeightToParent);
+  </script>
+</body>
+</html>
