@@ -159,82 +159,65 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const categoryParam = params.get("category") || "";
+  const selectedCategories = categoryParam
+    .split(",")
+    .map(c => c.trim().toLowerCase())
+    .filter(c => c);
 
-function toSlug(str) {
-  return str
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-");
-}
+  const mainCategory = selectedCategories[0] || "unknown";
 
-const selectedCategories = categoryParam
-  .split(",")
-  .map(c => toSlug(c))
-  .filter(c => c);
+  const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
 
-const mainCategory = selectedCategories[0] || "unknown";
-
-fetch(SHEET_URL)
-  .then(res => res.json())
-  .then(data => {
-    const filtered = data.filter(item => {
-      const tags = [
-        item.Category,
-        item.Feature1,
-        item.Feature2,
-        item.Feature3
-      ]
-        .filter(Boolean)
-        .flatMap(val => val.split(","))
-        .map(tag => toSlug(tag));
-
-      return selectedCategories.some(cat => tags.includes(cat));
-    });
-
-    const container = document.getElementById("productContainer");
-
-    if (filtered.length === 0) {
-      window.parent.postMessage({ type: "noProducts" }, "*");
-      container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${categoryParam}"</p>`;
-      return;
-    }
-
-    filtered.forEach(item => {
-      const utmLink = `${item.link}?utm_source=blog&utm_medium=mars-home&utm_campaign=${encodeURIComponent(mainCategory)}`;
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `
-        <a href="${utmLink}" target="_blank" class="buy-link">
-          <div class="product-image-wrapper">
-            <img src="${item.image}" alt="${item.name}" />
-          </div>
-          <div class="product-info">
-            <div class="product-title">${item.name}</div>
-            <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-            <p class="product-price">
-              <span class="original-price">${item.originalPrice}</span>
-              <span class="discounted-price">${item.price}</span>
-            </p>
-            <button class="buy-button">Mua trên Shopee</button>
-          </div>
-        </a>
-      `;
-
-      card.querySelector(".buy-link").addEventListener("click", function () {
-        gtag('event', 'click_mua_tren_shopee', {
-          event_category: 'button',
-          event_label: mainCategory,
-          value: 1
-        });
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.filter(item => {
+        const cat = item.category?.toLowerCase();
+        return selectedCategories.length === 0 || selectedCategories.includes(cat);
       });
 
-      container.appendChild(card);
-    });
+      const container = document.getElementById("productContainer");
 
-    sendHeightToParent();
-  });
+      if (filtered.length === 0) {
+        window.parent.postMessage({ type: "noProducts" }, "*");
+        container.innerHTML = `<p style="padding:16px">Không có sản phẩm trong danh mục "${categoryParam}"</p>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const utmLink = `${item.link}?utm_source=blog&utm_medium=mars-home&utm_campaign=${encodeURIComponent(mainCategory)}`;
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <a href="${utmLink}" target="_blank" class="buy-link">
+            <div class="product-image-wrapper">
+              <img src="${item.image}" alt="${item.name}" />
+            </div>
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+              <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+              <p class="product-price">
+                <span class="original-price">${item.originalPrice}</span>
+                <span class="discounted-price">${item.price}</span>
+              </p>
+              <button class="buy-button">Mua trên Shopee</button>
+            </div>
+          </a>
+        `;
+
+        card.querySelector(".buy-link").addEventListener("click", function () {
+          gtag('event', 'click_mua_tren_shopee', {
+            event_category: 'button',
+            event_label: mainCategory,
+            value: 1
+          });
+        });
+
+        container.appendChild(card);
+      });
+
+      sendHeightToParent();
+    });
 
   function sendHeightToParent() {
     const height = document.body.scrollHeight;
