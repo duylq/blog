@@ -114,6 +114,19 @@
 	  font-size: 14px;
       cursor: pointer;
     }
+
+	.product-buttons {
+	  display: flex;
+	  gap: 8px;
+	  margin-top: 8px;
+	  flex-wrap: wrap;
+	}
+
+	.buy-button {
+	  flex: 1;
+	  white-space: nowrap;
+	}
+
 	
 	.xem-chi-tiet {
 	  background-color: #555;
@@ -208,24 +221,27 @@
 				  const card = document.createElement("div");
 				  card.className = "product-card";
 				  card.innerHTML = `
-					<div class="product-image-wrapper">
-					  <img src="${item.image}" alt="${item.name}" />
-					</div>
-					<div class="product-info">
-					  <div class="product-title">${item.name}</div>
-					  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-					  <p class="product-price">
-						<span class="original-price">${item.originalPrice}</span>
-						<span class="discounted-price">${item.price}</span>
-					  </p>
-					  <a href="${utmLink}" target="_blank">
-						<button class="buy-button mua-shopee">Mua trên Shopee</button>
-					  </a>
-					  <a href="${detailLink}" target="_blank">
-						<button class="buy-button xem-chi-tiet" style="background-color: #888; margin-top: 6px;">Xem chi tiết</button>
-					  </a>
-					</div>
-				  `;
+					  <div class="product-image-wrapper">
+						<img src="${item.image}" alt="${item.name}" />
+					  </div>
+					  <div class="product-info">
+						<div class="product-title">${item.name}</div>
+						<div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+						<p class="product-price">
+						  <span class="original-price">${item.originalPrice}</span>
+						  <span class="discounted-price">${item.price}</span>
+						</p>
+						<div class="product-buttons">
+						  <a href="${utmLink}" target="_blank">
+							<button class="buy-button mua-shopee">Mua trên Shopee</button>
+						  </a>
+						  <a href="${detailLink}" target="_blank">
+							<button class="buy-button xem-chi-tiet">Xem chi tiết</button>
+						  </a>
+						</div>
+					  </div>
+					`;
+
 
 				  card.querySelector(".mua-shopee").addEventListener("click", function () {
 					gtag('event', 'click_mua_tren_shopee', {
