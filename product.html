@@ -158,11 +158,20 @@
 </script>
 <script>
   const params = new URLSearchParams(window.location.search);
-  const categoryParam = params.get("connect") || "";
-  const selectedCategories = categoryParam
-    .split(",")
-    .map(c => c.trim().toLowerCase())
-    .filter(c => c);
+  
+  const params = new URLSearchParams(window.location.search);
+  const filterFields = ['category', 'connect', 'feature'];
+  const filters = {};
+
+  filterFields.forEach(field => {
+    const value = params.get(field);
+    if (value) {
+      filters[field] = value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+    }
+  });
+
+  const mainCategory = filters.category?.[0] || "unknown";
+
 
   const mainCategory = selectedCategories[0] || "unknown";
 
@@ -171,10 +180,14 @@
   fetch(SHEET_URL)
     .then(res => res.json())
     .then(data => {
-      const filtered = data.filter(item => {
-        const cat = item.connect?.toLowerCase();
-        return selectedCategories.length === 0 || selectedCategories.includes(cat);
+      const filtered = 
+      data.filter(item => {
+        return Object.entries(filters).every(([key, values]) => {
+          const cellValue = item[key]?.toLowerCase?.() || '';
+          return values.some(value => cellValue.includes(value));
+        });
       });
+    
 
       const container = document.getElementById("productContainer");
 
