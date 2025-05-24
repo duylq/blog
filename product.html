@@ -155,12 +155,21 @@
     fetch(SHEET_URL)
       .then(res => res.json())
       .then(data => {
-        const filtered = data.filter(item => {
-          return Object.entries(filters).every(([key, values]) => {
-            const cellValue = item[key]?.toLowerCase?.() || '';
-            return values.some(value => cellValue.includes(value));
-          });
-        });
+        //const filtered = data.filter(item => {
+        //  return Object.entries(filters).every(([key, values]) => {
+        //    const cellValue = item[key]?.toLowerCase?.() || '';
+		//	return values.some(value => cellValue === value);
+        //  });
+        //});
+		
+		const filtered = data.filter(item => {
+		  return Object.entries(filters).every(([key, values]) => {
+			const cellValue = item[key]?.toLowerCase?.() || '';
+			const cellValues = cellValue.split(',').map(v => v.trim());  // Tách từng giá trị
+			return values.some(value => cellValues.includes(value));
+		  });
+		});
+
 
         const container = document.getElementById("productContainer");
 
