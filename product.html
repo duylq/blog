@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="vi">
 <head>
 <meta charset="utf-8"/>
@@ -15,225 +14,214 @@
       display: flex;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-	  -webkit-overflow-scrolling: touch;
+      -webkit-overflow-scrolling: touch;
       gap: 10px;
       padding: 10px 0;
     }
-	
     .product-card {
       scroll-snap-align: start;
-	  flex: 0 0 auto;
+      flex: 0 0 auto;
       width: 250px;
       max-height: 400px;
-	  overflow: hidden;
+      overflow: hidden;
       border: 1px solid #ddd;
-	  padding: 10px;
+      padding: 10px;
       border-radius: 10px;
-      font-family: 'Inter', Arial, sans-serif;
-	  background: #fff;
+      background: #fff;
     }
-	
-	.product-card a {
-	  text-decoration: none;
-	  color: inherit;
-	}
-	
     .product-image-wrapper {
       width: 100%;
-	  padding-top: 100%;
-	  position: relative;
-	  border-radius: 8px;
-	  overflow: hidden;
+      padding-top: 100%;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
     }
-	
-	.product-image-wrapper img {
+    .product-image-wrapper img {
       position: absolute;
-	  top: 0;
-	  left: 0;
-	  width: 100%;
-	  height: 100%;
-	  object-fit: cover;
-	  object-position: top;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
     }
-	
     .product-info {
       padding: 8px;
       display: flex;
       flex-direction: column;
     }
-	
     .product-title {
-		font-size: 14px;
-		font-weight: bold;
-		margin: 8px 0 4px;
-		height: 35px;
-		overflow: hidden;					  
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 8px 0 4px;
+      height: 35px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
-	
     .product-rating {
       font-size: 13px;
       color: #f5a623;
       margin: 2px 0 4px;
     }
-	
-	.product-rating span {
+    .product-rating span {
       color: #555;
-	  font-size: 12px;
+      font-size: 12px;
       margin-left: 6px;
     }
-	
     .product-price {
       margin: 4px 0;
     }
-	
     .original-price {
       text-decoration: line-through;
       color: #888;
-	  font-size: 13px;
-    }
-	
-    .discounted-price {
-		color: red;
-		font-weight: bold;
-		font-size: 14px;
-		margin-left: 6px;
-    }
-	
-    .buy-button {
-      margin-top: 8px;
-      background-color: #ee4d2d;
-      color: white;
-      border: none;
-      padding: 8px;
-      border-radius: 4px;
-      text-align: center;
-	  font-family: 'Inter', Arial, sans-serif;
-	  font-size: 14px;
-      cursor: pointer;
-    }
-	
-	@media screen and (max-width: 600px) {
-    .product-card {
-      width: 180px;
-      max-height: none;
-      height: auto;
-      padding: 8px;
-    }
-
-    .product-title {
-      font-size: 14px;
-    }
-	
-	.original-price {
-	  font-size: 13px;
-    }
-
-    .discount-price {
-      font-size: 14px;
-    }
-																									  																	 
-    .buy-button {
       font-size: 13px;
     }
-  }
-	
-  </style>
+    .discounted-price {
+      color: red;
+      font-weight: bold;
+      font-size: 14px;
+      margin-left: 6px;
+    }
+    .product-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .buy-button {
+      flex: 1;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Inter', Arial, sans-serif;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+    }
+    .mua-shopee {
+      background-color: #ee4d2d;
+      color: white;
+    }
+    .mua-shopee:hover {
+      background-color: #d4391c;
+    }
+    .xem-chi-tiet {
+      background-color: #109e92;
+      color: white;
+    }
+    .xem-chi-tiet:hover {
+      background-color: #1c274c;
+    }
+    @media screen and (max-width: 600px) {
+      .product-card {
+        width: 180px;
+        max-height: none;
+        height: auto;
+        padding: 8px;
+      }
+    }
+</style>
 </head>
 <body>
-	<div class="carousel-container" id="productContainer">
-	<!-- Sản phẩm sẽ được tạo từ JS -->
-	</div>
+  <div class="carousel-container" id="productContainer">
+    <!-- Sản phẩm sẽ được tạo từ JS -->
+  </div>
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RZNZVL9VP9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RZNZVL9VP9', { 'debug_mode': true });
+  </script>
 
-	<!-- Google tag (gtag.js) -->
-	<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-RZNZVL9VP9"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-	  gtag('config', 'G-RZNZVL9VP9', { 'debug_mode': true }); // Bật debug mode tại đây
-	</script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const filterFields = ['category', 'connect', 'feature', 'brand', 'system', 'other'];
+    const filters = {};
+    filterFields.forEach(field => {
+      const value = params.get(field);
+      if (value) {
+        filters[field] = value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+      }
+    });
+    const mainCategory = filters.category?.[0] || "unknown";
+    const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
 
-	<script>
-	  const params = new URLSearchParams(window.location.search);
-	  const filterFields = ['category', 'connect', 'feature', 'brand', 'system', 'other'];
-	  const filters = {};
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(item => {
+          return Object.entries(filters).every(([key, values]) => {
+            const cellValue = item[key]?.toLowerCase?.() || '';
+            return values.some(value => cellValue.includes(value));
+          });
+        });
 
-	  filterFields.forEach(field => {
-		const value = params.get(field);
-		if (value) {
-		  filters[field] = value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
-		}
-	  });
+        const container = document.getElementById("productContainer");
 
-	  const mainCategory = filters.category?.[0] || "unknown";
+        if (filtered.length === 0) {
+          window.parent.postMessage({ type: "noProducts" }, "*");
+          container.innerHTML = '<p style="padding:16px">Không có sản phẩm phù hợp với tiêu chí lọc</p>';
+          return;
+        }
 
-	  const SHEET_URL = "https://opensheet.elk.sh/1YXJYDuLYZMATHHotgqpT6SLSV_QXXTMc5WR044N749o/1";
+        filtered.forEach(item => {
+          const utmLink = item.link + "?utm_source=blog&utm_medium=mars-home&utm_campaign=" + encodeURIComponent(mainCategory) + "&utm_content=buy_button";
+          const detailUTMLink = item.linkweb + "?utm_source=blog&utm_medium=mars-home&utm_campaign=" + encodeURIComponent(mainCategory) + "&utm_content=view_detail_button";
+          const card = document.createElement("div");
+          card.className = "product-card";
+          card.innerHTML = `
+            <div class="product-image-wrapper">
+              <img src="${item.image}" alt="${item.name}" />
+            </div>
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+              <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
+              <p class="product-price">
+                <span class="original-price">${item.originalPrice}</span>
+                <span class="discounted-price">${item.price}</span>
+              </p>
+              <div class="product-buttons">
+				<a href="${detailUTMLink}" target="_blank">
+                  <button class="buy-button xem-chi-tiet">Xem trên web</button>
+                </a>
+                <a href="${utmLink}" target="_blank">
+                  <button class="buy-button mua-shopee">Xem trên Shopee</button>
+                </a>
+              </div>
+            </div>
+          `;
+          card.querySelector(".mua-shopee").addEventListener("click", function () {
+            gtag('event', 'click_mua_tren_shopee', {
+              event_category: 'button',
+              event_label: item.name,
+              value: 1
+            });
+          });
+          card.querySelector(".xem-chi-tiet").addEventListener("click", function () {
+            gtag('event', 'click_xem_chi_tiet', {
+              event_category: 'button',
+              event_label: item.name,
+              value: 1
+            });
+          });
+          container.appendChild(card);
+        });
 
-	  fetch(SHEET_URL)
-		.then(res => res.json())
-		.then(data => {
-			const filtered = data.filter(item => {
-				return Object.entries(filters).every(([key, values]) => {
-				  const cellValue = item[key]?.toLowerCase?.() || '';
-				  return values.some(value => cellValue.includes(value));
-				});
-			});
+        sendHeightToParent();
+      });
 
-			const container = document.getElementById("productContainer");
+    function sendHeightToParent() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
+    }
 
-			if (filtered.length === 0) {
-				window.parent.postMessage({ type: "noProducts" }, "*");
-				container.innerHTML = `<p style="padding:16px">Không có sản phẩm phù hợp với tiêu chí lọc</p>`;
-				return;
-			}
-
-			filtered.forEach(item => {
-				const utmLink = `${item.link}?utm_source=blog&utm_medium=mars-home&utm_campaign=${encodeURIComponent(mainCategory)}`;
-				const card = document.createElement("div");
-				card.className = "product-card";
-				card.innerHTML = `
-				  <a href="${utmLink}" target="_blank" class="buy-link">
-					<div class="product-image-wrapper">
-					  <img src="${item.image}" alt="${item.name}" />
-					</div>
-					<div class="product-info">
-					  <div class="product-title">${item.name}</div>
-					  <div class="product-rating">★★★★★ ${item.rating} <span>Đã bán ${item.sold}</span></div>
-					  <p class="product-price">
-						<span class="original-price">${item.originalPrice}</span>
-						<span class="discounted-price">${item.price}</span>
-					  </p>
-					  <button class="buy-button">Mua trên Shopee</button>
-					</div>
-				  </a>
-				`;
-
-				card.querySelector(".buy-link").addEventListener("click", function () {
-					gtag('event', 'click_mua_tren_shopee', {
-						event_category: 'button',
-						event_label: mainCategory,
-						value: 1
-					});
-				});
-
-				container.appendChild(card);
-			});
-
-		  sendHeightToParent();
-		});
-
-		function sendHeightToParent() {
-			const height = document.body.scrollHeight;
-			parent.postMessage({ type: "setIframeHeight", height: height }, "https://blog.marshome.io.vn");
-		}
-
-		window.addEventListener("load", sendHeightToParent);
-		window.addEventListener("resize", sendHeightToParent);
-	</script>
-
+    window.addEventListener("load", sendHeightToParent);
+    window.addEventListener("resize", sendHeightToParent);
+  </script>
 </body>
 </html>
