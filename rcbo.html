@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng Dẫn Toàn Diện Về RCBO Cho Gia Đình</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Report Info: RCBO vs MCB/RCCB features. Goal: Compare. Viz: Grouped Bar Chart (Chart.js) showing protection types (Overload, Short Circuit, Earth Leakage). Interaction: Static chart with tooltips. Justification: Clear visual differentiation of capabilities.
+        - Report Info: RCBO Types (AC, A, F, B) detection capabilities. Goal: Compare. Viz: Grouped Bar Chart (Chart.js) showing detectable current types (Sinusoidal AC, Pulsating DC, Mixed Frequency, Smooth DC). Interaction: Static chart, linked to tabbed text explanations. Justification: Visual summary of complex differences.
+        - Report Info: Rated Current (In) calculation. Goal: Inform/Calculate. Viz: Input field for total wattage, output for suggested Amps. Interaction: User input triggers JS calculation. Justification: Practical tool for users.
+        - Report Info: Parameters (IΔn, Curve, Poles, Types). Goal: Inform/Explore. Viz: Text explanations within clickable tabs/accordions. Interaction: Click to reveal detailed information. Justification: Organizes dense information, allows user-controlled exploration depth.
+        - Report Info: Scenario-based RCBO selection. Goal: Guide. Viz: Dropdown menus for scenarios (e.g., whole house, specific appliance). Interaction: User selects scenario, JS displays recommended RCBO parameters. Justification: Practical application of knowledge for easier decision-making.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-content.open { max-height: 1000px; /* Adjust as needed */ }
+        /*.sticky-nav { position: sticky; top: 0; z-index: 50; }*/
+        html { scroll-behavior: smooth; }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+		
+		.entry-content-wrap { margin: 0 0 0; !important } /* cho thanh nav nằm sát lên trên */
+		
+		.post-body h1 {
+			font-size: 1.875rem; !important;
+			line-height: 2.25rem; !important;
+			color: #FFF; !important;
+			margin: 0 0 0; !important;
+		}
+		.post-body h2 {
+			margin-top: 1.5rem; !important;
+			margin-bottom: 1rem; !important;
+			color: rgb(3 105 161 / var(--tw-text-opacity, 1)); !important;
+		}
+		.post-body h3 {
+			color: rgb(2 132 199 / var(--tw-text-opacity, 1)); !important;
+		}
+		.post-body ul {
+			padding: 0; !important;
+		}
+		.post-body p {
+			margin-bottom: 0; !important;
+		}
+
+		
+	</style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <header class="bg-sky-700 text-white p-2 shadow-md sticky-nav">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-4 md:mb-0">Hướng Dẫn Cách Chọn RCBO Phù Hợp</h1>
+            <!-- <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#gioi-thieu" class="hover:text-sky-200">Giới Thiệu</a></li>
+                    <li><a href="#thong-so" class="hover:text-sky-200">Thông Số</a></li>
+                    <li><a href="#chon-rcbo" class="hover:text-sky-200">Chọn RCBO</a></li>
+                    <li><a href="#lap-dat" class="hover:text-sky-200">Lắp Đặt</a></li>
+                </ul>
+
+            </nav> -->
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6">
+        <section id="gioi-thieu" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold text-sky-700 mb-4">RCBO Là Gì và Tại Sao Lại Quan Trọng?</h2>
+            <p class="mb-4 text-lg leading-relaxed">
+                Trong thế giới hiện đại với vô số thiết bị điện, an toàn điện là ưu tiên hàng đầu cho mỗi gia đình. Aptomat chống giật kết hợp bảo vệ quá dòng (RCBO) là một thiết bị thiết yếu, đóng vai trò như một người vệ sĩ thầm lặng, bảo vệ bạn và gia đình khỏi các nguy cơ điện giật, cháy nổ do sự cố điện. Trang web này sẽ cung cấp cho bạn kiến thức toàn diện để hiểu rõ và lựa chọn RCBO phù hợp nhất.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8 items-start">
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-sky-600 mb-3">RCBO: Người Bảo Vệ Toàn Diện</h3>
+                    <p class="mb-2">RCBO (Residual Current Circuit Breaker with Overcurrent Protection) là thiết bị bảo vệ mạch điện tiên tiến, tích hợp 3 chức năng quan trọng:</p>
+                    <ul class="list-disc list-inside space-y-1 mb-3">
+                        <li><strong>Chống dòng rò (Chống giật):</strong> Phát hiện và ngắt mạch khi có dòng điện rò rỉ xuống đất (ví dụ qua cơ thể người), ngăn ngừa điện giật.</li>
+                        <li><strong>Chống quá tải:</strong> Ngắt mạch khi tổng công suất sử dụng vượt quá giới hạn cho phép, bảo vệ dây dẫn và thiết bị.</li>
+                        <li><strong>Chống ngắn mạch (Chập điện):</strong> Ngắt mạch cực nhanh khi xảy ra chập điện, ngăn chặn nguy cơ cháy nổ.</li>
+                    </ul>
+                    <p>Sự kết hợp "3 trong 1" này giúp RCBO trở thành giải pháp tối ưu, tiết kiệm không gian và đơn giản hóa việc lắp đặt so với việc dùng riêng MCB và RCCB.</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-sky-600 mb-3">So Sánh RCBO, MCB và RCCB</h3>
+                    <p class="mb-3">Để hiểu rõ hơn ưu điểm của RCBO, hãy xem bảng so sánh nhanh các chức năng bảo vệ:</p>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600">Biểu đồ trên minh họa khả năng bảo vệ của từng loại thiết bị. RCBO cung cấp sự bảo vệ toàn diện nhất.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="thong-so" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold text-sky-700 mb-6">Hiểu Rõ Các Thông Số Kỹ Thuật Của RCBO</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Việc lựa chọn RCBO phù hợp đòi hỏi bạn phải hiểu các thông số kỹ thuật quan trọng được ghi trên thiết bị. Mỗi thông số đều có ý nghĩa riêng và ảnh hưởng trực tiếp đến khả năng bảo vệ. Hãy cùng khám phá chi tiết từng thông số dưới đây.
+            </p>
+
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>1. Dòng Điện Định Mức (In)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p><strong>Ý nghĩa:</strong> Là cường độ dòng điện tối đa (Ampe - A) mà RCBO cho phép đi qua liên tục mà không ngắt. Các giá trị phổ biến từ 6A đến 63A.</p>
+                        <p><strong>Cách chọn:</strong></p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Tính tổng công suất (P - Watt) của các thiết bị trên mạch.</li>
+                            <li>Áp dụng công thức: <code>I = P / U</code> (U thường là 220V ở Việt Nam).</li>
+                            <li>Chọn In lớn hơn giá trị I tính được khoảng 25-30% để có biên độ an toàn (ví dụ, cho dòng khởi động của động cơ).</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-sky-50 rounded-md">
+                            <h4 class="font-semibold mb-2 text-sky-700">Công Cụ Tính Dòng Điện Định Mức (In) Gợi Ý:</h4>
+                            <label for="totalPower" class="block mb-1">Tổng công suất các thiết bị (Watt):</label>
+                            <input type="number" id="totalPower" class="w-full md:w-1/2 p-2 border border-sky-300 rounded-md mb-2" placeholder="Ví dụ: 2500">
+                            <button id="calculateIn" class="bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700">Tính Toán</button>
+                            <p id="resultIn" class="mt-2 font-semibold"></p>
+                        </div>
+                        <p class="mt-2"><strong>Ví dụ:</strong> Bình nóng lạnh 2500W: I = 2500/220 ≈ 11.36A. Nên chọn RCBO 16A.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>2. Dòng Rò Tác Động (IΔn)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p><strong>Ý nghĩa:</strong> Là ngưỡng dòng rò (miliAmpe - mA) mà khi vượt qua, RCBO sẽ ngắt mạch để chống giật.</p>
+                        <p><strong>Các mức phổ biến và ứng dụng:</strong></p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>10mA:</strong> Độ nhạy rất cao. Lý tưởng cho khu vực ẩm ướt (phòng tắm, máy nước nóng), hoặc nơi có nguy cơ cao (phòng trẻ em).</li>
+                            <li><strong>30mA:</strong> Mức phổ biến nhất, khuyến nghị cho hầu hết các ứng dụng dân dụng, đảm bảo an toàn chống giật hiệu quả.</li>
+                            <li><strong>100mA, 300mA, 500mA:</strong> Thường dùng cho mục đích chống cháy do dòng rò hoặc cho RCBO tổng của tòa nhà/xưởng, nơi ưu tiên bảo vệ tài sản.</li>
+                        </ul>
+                        <p class="mt-2"><strong>Lưu ý:</strong> Nên áp dụng "phân cấp" bảo vệ: RCBO nhánh (10mA/30mA) và RCBO tổng (có thể 100mA/300mA) để đảm bảo chỉ ngắt mạch có sự cố.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>3. Khả Năng Cắt Ngắn Mạch (Icu/Icn)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p><strong>Ý nghĩa:</strong> Là khả năng của RCBO chịu đựng và ngắt dòng điện cực lớn khi xảy ra ngắn mạch (chập điện) mà không bị hỏng (đo bằng kiloAmpe - kA).</p>
+                        <p><strong>Mức phù hợp cho gia đình:</strong></p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>4.5kA hoặc 6kA:</strong> Đây là các mức phổ biến và đủ an toàn cho hầu hết hệ thống điện dân dụng tại Việt Nam.</li>
+                            <li>Các mức cao hơn (10kA, 15kA,...) thường dành cho công nghiệp hoặc các tòa nhà lớn.</li>
+                        </ul>
+                        <p class="mt-2">Chọn Icu phù hợp đảm bảo RCBO hoạt động bền bỉ và an toàn ngay cả khi có sự cố nghiêm trọng.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>4. Số Cực (1P+N, 2P)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p>Đối với điện 1 pha 220V gia đình, có hai loại chính:</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>1P+N (1 Pole + Neutral):</strong> Có 2 cực đấu dây (1 Pha + 1 Trung tính). Chỉ bảo vệ quá dòng/ngắn mạch trên dây Pha. Dây Trung tính được ngắt cùng lúc nhưng không được bảo vệ. Kích thước thường nhỏ gọn (1 module/tép).</li>
+                            <li><strong>2P (2 Poles):</strong> Có 2 cực đấu dây. Bảo vệ quá dòng/ngắn mạch trên cả dây Pha và dây Trung tính. Cả hai dây đều được ngắt đồng thời. Kích thước thường lớn hơn (2 module/tép).</li>
+                        </ul>
+                        <p class="mt-2"><strong>Lựa chọn:</strong></p>
+                         <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>1P+N:</strong> Phổ biến, kinh tế, đủ an toàn cho nhiều ứng dụng gia đình.</li>
+                            <li><strong>2P:</strong> Bảo vệ toàn diện hơn, đặc biệt quan trọng nếu có nguy cơ lỗi trên dây trung tính. Nên ưu tiên cho RCBO tổng hoặc các mạch/thiết bị quan trọng.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>5. Điện Áp Hoạt Động (Ue)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p><strong>Ý nghĩa:</strong> Là điện áp (Volt - V) mà RCBO được thiết kế để hoạt động ổn định và an toàn.</p>
+                        <p><strong>Tiêu chuẩn Việt Nam:</strong> Hệ thống điện dân dụng Việt Nam sử dụng điện áp <strong>220V/230V AC</strong>. Cần chọn RCBO có điện áp định mức phù hợp (thường ghi là 230V hoặc 240V trên thiết bị, tương thích với lưới 220V).</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>6. Đường Cong Đặc Tính (Type B, C, D)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p>Mô tả độ nhạy của RCBO với dòng khởi động của thiết bị, quyết định thời gian ngắt mạch khi có quá tải/ngắn mạch.</p>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Type B:</strong> Ngắt nhanh (khi dòng điện gấp 3-5 lần dòng định mức). Phù hợp cho tải thuần trở, chiếu sáng, ổ cắm thông thường (TV, máy tính).</li>
+                            <li><strong>Type C:</strong> Ngắt ở mức trung bình (khi dòng điện gấp 5-10 lần dòng định mức). Phổ biến nhất cho gia đình, phù hợp cho các thiết bị có dòng khởi động vừa phải (điều hòa, tủ lạnh, máy giặt, bếp từ).</li>
+                            <li><strong>Type D:</strong> Ngắt chậm hơn (khi dòng điện gấp 10-20 lần dòng định mức). Dùng cho tải có dòng khởi động rất lớn (động cơ công nghiệp), ít dùng trong gia đình.</li>
+                        </ul>
+                        <p class="mt-2">Chọn đúng đường cong giúp tránh RCBO nhảy không cần thiết (nuisance tripping).</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <button class="accordion-toggle w-full text-left text-xl font-semibold text-sky-600 hover:text-sky-800 focus:outline-none flex justify-between items-center">
+                        <span>7. Loại RCBO Theo Khả Năng Phát Hiện Dòng Rò (Type AC, A, F, B)</span>
+                        <span class="arrow-icon transition-transform duration-300">&#9660;</span>
+                    </button>
+                    <div class="accordion-content mt-4 text-gray-700 space-y-3">
+                        <p>Đây là thông số rất quan trọng, đặc biệt với các thiết bị điện tử hiện đại:</p>
+                        <div id="rcboTypeTabs" class="mb-4 border-b border-gray-200">
+                            <nav class="flex space-x-4" aria-label="Tabs">
+                                <button data-tab="typeAC" class="rcbo-type-tab px-3 py-2 font-medium text-sm rounded-t-lg hover:bg-sky-100 focus:outline-none active-tab bg-sky-100 text-sky-700">Type AC</button>
+                                <button data-tab="typeA" class="rcbo-type-tab px-3 py-2 font-medium text-sm rounded-t-lg hover:bg-sky-100 focus:outline-none">Type A</button>
+                                <button data-tab="typeF" class="rcbo-type-tab px-3 py-2 font-medium text-sm rounded-t-lg hover:bg-sky-100 focus:outline-none">Type F</button>
+                                <button data-tab="typeB" class="rcbo-type-tab px-3 py-2 font-medium text-sm rounded-t-lg hover:bg-sky-100 focus:outline-none">Type B</button>
+                            </nav>
+                        </div>
+
+                        <div id="typeACContent" class="tab-content active">
+                            <h4 class="font-semibold text-md mb-1">Type AC</h4>
+                            <p>Chỉ phát hiện dòng rò xoay chiều hình sin (AC). Phù hợp cho các tải thuần trở truyền thống (đèn sợi đốt, bếp điện đơn giản). <strong>Hạn chế:</strong> Không phát hiện được dòng rò một chiều xung từ các thiết bị điện tử hiện đại.</p>
+                        </div>
+                        <div id="typeAContent" class="tab-content">
+                            <h4 class="font-semibold text-md mb-1">Type A</h4>
+                            <p>Phát hiện dòng rò xoay chiều hình sin (AC) và dòng rò một chiều xung (pulsating DC). <strong>Khuyến nghị mạnh mẽ</strong> cho hầu hết gia đình hiện đại có nhiều thiết bị điện tử (máy tính, TV, máy giặt, điều hòa inverter, đèn LED, sạc EV).</p>
+                        </div>
+                        <div id="typeFContent" class="tab-content">
+                            <h4 class="font-semibold text-md mb-1">Type F</h4>
+                            <p>Phát hiện dòng rò AC, DC xung, và dòng rò hỗn hợp tần số. Thích hợp cho các thiết bị có điều khiển tần số (máy giặt inverter, điều hòa inverter, bơm nhiệt).</p>
+                        </div>
+                        <div id="typeBContent" class="tab-content">
+                            <h4 class="font-semibold text-md mb-1">Type B</h4>
+                            <p>Phát hiện tất cả các loại dòng rò (AC, DC xung, DC mịn). Cần thiết cho các ứng dụng đặc biệt như trạm sạc xe điện (EV chargers) công suất lớn, hệ thống năng lượng mặt trời (PV), thang máy.</p>
+                        </div>
+                        <div class="mt-4 chart-container">
+                             <canvas id="rcboTypeChart"></canvas>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">Biểu đồ minh họa các loại dòng rò mà từng Type RCBO có thể phát hiện.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="chon-rcbo" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold text-sky-700 mb-6">Hướng Dẫn Chọn RCBO Phù Hợp Cho Gia Đình</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Lựa chọn RCBO đúng không chỉ đảm bảo an toàn mà còn tối ưu hóa hiệu quả hoạt động của hệ thống điện. Dưới đây là công cụ gợi ý giúp bạn chọn RCBO dựa trên nhu cầu cụ thể.
+            </p>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold text-sky-600 mb-4">Công Cụ Gợi Ý Chọn RCBO</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="protectionTarget" class="block mb-1 font-medium">Bạn muốn bảo vệ cho khu vực/thiết bị nào?</label>
+                        <select id="protectionTarget" class="w-full p-2 border border-sky-300 rounded-md">
+                            <option value="">-- Chọn mục tiêu --</option>
+                            <option value="whole_house">Toàn bộ ngôi nhà (RCBO tổng)</option>
+                            <option value="floor">Một tầng riêng biệt</option>
+                            <option value="wet_area">Khu vực ẩm ướt (Phòng tắm, bếp gần bồn rửa)</option>
+                            <option value="sensitive_appliance">Thiết bị nhạy cảm/công suất lớn (Bình nóng lạnh, điều hòa, bếp từ)</option>
+                            <option value="electronics_heavy">Nhà có nhiều thiết bị điện tử hiện đại</option>
+                            <option value="ev_charger">Trạm sạc xe điện (EV Charger)</option>
+                        </select>
+                    </div>
+                    <div id="applianceTypeDiv" class="hidden">
+                        <label for="applianceType" class="block mb-1 font-medium">Loại thiết bị cụ thể:</label>
+                        <select id="applianceType" class="w-full p-2 border border-sky-300 rounded-md">
+                            <option value="">-- Chọn thiết bị --</option>
+                            <option value="water_heater">Bình nóng lạnh</option>
+                            <option value="air_conditioner">Điều hòa không khí</option>
+                            <option value="induction_cooker">Bếp từ</option>
+                            <option value="washing_machine_inverter">Máy giặt Inverter</option>
+                        </select>
+                    </div>
+                    <button id="getRecommendation" class="bg-sky-600 text-white px-6 py-2 rounded-md hover:bg-sky-700">Xem Gợi Ý</button>
+                </div>
+                <div id="recommendationResult" class="mt-6 p-4 bg-sky-50 rounded-md border border-sky-200 hidden">
+                    <h4 class="text-lg font-semibold text-sky-700 mb-2">Gợi ý RCBO cho bạn:</h4>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li id="recIn"><strong>Dòng điện định mức (In):</strong> </li>
+                        <li id="recDeltaN"><strong>Dòng rò (IΔn):</strong> </li>
+                        <li id="recType"><strong>Loại RCBO (Type):</strong> </li>
+                        <li id="recPoles"><strong>Số cực:</strong> </li>
+                        <li id="recCurve"><strong>Đường cong:</strong> </li>
+                        <li id="recIcu"><strong>Khả năng cắt ngắn mạch (Icu):</strong> </li>
+                    </ul>
+                    <p class="mt-3 text-sm text-gray-600"><strong>Lưu ý:</strong> Đây là gợi ý chung. Luôn tính toán công suất thực tế và tham khảo ý kiến thợ điện chuyên nghiệp để có lựa chọn chính xác nhất.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="lap-dat" class="mb-12 pt-16 -mt-16">
+            <h2 class="text-3xl font-semibold text-sky-700 mb-6">Lắp Đặt và Bảo Trì RCBO</h2>
+            <p class="mb-6 text-lg leading-relaxed">
+                Việc lắp đặt đúng cách và bảo trì định kỳ sẽ đảm bảo RCBO hoạt động hiệu quả và bền bỉ, giữ an toàn cho gia đình bạn.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-sky-600 mb-3">Hướng Dẫn Lắp Đặt Cơ Bản</h3>
+                     <p class="mb-2"><strong>QUAN TRỌNG:</strong> Việc lắp đặt điện cần được thực hiện bởi người có chuyên môn. Nếu không chắc chắn, hãy gọi thợ điện.</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>An toàn là trên hết:</strong> Luôn ngắt nguồn điện chính trước khi lắp đặt.</li>
+                        <li><strong>Vị trí:</strong> Lắp trong tủ điện tổng hoặc tủ nhánh. RCBO cho thiết bị riêng (bình nóng lạnh) nên đặt gần thiết bị.</li>
+                        <li><strong>Đấu nối đúng cực:</strong>
+                            <ul class="list-circle list-inside ml-6">
+                                <li>Dây nguồn (vào): Đấu vào cọc phía trên (thường ký hiệu L-IN, N-IN).</li>
+                                <li>Dây tải (ra thiết bị): Đấu vào cọc phía dưới (thường ký hiệu L-OUT, N-OUT).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Siết chặt các mối nối:</strong> Đảm bảo tiếp xúc tốt, tránh lỏng lẻo gây hồ quang.</li>
+                        <li><strong>Dây nối đất (Tiếp địa):</strong> Hệ thống điện cần có dây nối đất đúng chuẩn để RCBO phát huy tối đa hiệu quả chống giật.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-sky-600 mb-3">Kiểm Tra Định Kỳ và Lưu Ý</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>Nút TEST:</strong> Hầu hết RCBO đều có nút "TEST" (thường màu vàng/xanh).
+                            <div class="tooltip">
+                                <span class="font-semibold text-sky-600 cursor-pointer">Nhấn nút TEST ít nhất 1 lần/tháng.</span>
+                                <span class="tooltiptext">Khi nhấn, RCBO phải ngắt điện. Nếu không, RCBO có thể bị hỏng và cần thay thế.</span>
+                            </div>
+                        </li>
+                        <li><strong>Không tự ý sửa chữa:</strong> Nếu RCBO gặp sự cố, hãy liên hệ thợ điện.</li>
+                        <li><strong>Môi trường lắp đặt:</strong> Tránh nơi ẩm ướt trực tiếp, nhiệt độ quá cao/thấp.</li>
+                        <li><strong>Vệ sinh:</strong> Giữ tủ điện sạch sẽ, không bụi bẩn.</li>
+                        <li><strong>Thương hiệu uy tín:</strong> Chọn RCBO từ các hãng có tên tuổi như Panasonic, Schneider, CHINT, Siemens, ABB,... để đảm bảo chất lượng và tiêu chuẩn an toàn (IEC/EN 61009-1).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center p-2 mt-12">
+        <p>&copy; <span id="currentYear"></span> Mars Home Blog - Thông tin chỉ mang tính tham khảo</p>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Accordion functionality
+        const accordionToggles = document.querySelectorAll('.accordion-toggle');
+        accordionToggles.forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const content = toggle.nextElementSibling;
+                const arrow = toggle.querySelector('.arrow-icon');
+                content.classList.toggle('open');
+                arrow.classList.toggle('rotate-180'); // Simple visual cue
+            });
+        });
+
+        // Rated Current (In) Calculator
+        const calculateInButton = document.getElementById('calculateIn');
+        const totalPowerInput = document.getElementById('totalPower');
+        const resultInP = document.getElementById('resultIn');
+
+        calculateInButton.addEventListener('click', () => {
+            const power = parseFloat(totalPowerInput.value);
+            if (isNaN(power) || power <= 0) {
+                resultInP.textContent = 'Vui lòng nhập tổng công suất hợp lệ.';
+                resultInP.style.color = 'red';
+                return;
+            }
+            const voltage = 220; // Standard voltage in Vietnam
+            const current = power / voltage;
+            const suggestedIn = Math.ceil(current * 1.3); // Add 30% safety margin and round up
+
+            resultInP.textContent = `Dòng điện tính toán: ${current.toFixed(2)}A. Gợi ý chọn RCBO có In = ${suggestedIn}A.`;
+            resultInP.style.color = 'green';
+        });
+
+        // RCBO Type Tabs
+        const rcboTypeTabs = document.querySelectorAll('.rcbo-type-tab');
+        const rcboTabContents = document.querySelectorAll('#thong-so .tab-content');
+
+        rcboTypeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+
+                rcboTypeTabs.forEach(t => {
+                    t.classList.remove('active-tab', 'bg-sky-100', 'text-sky-700');
+                });
+                tab.classList.add('active-tab', 'bg-sky-100', 'text-sky-700');
+
+                rcboTabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${targetTab}Content`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Charts
+        const ctxComparison = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(ctxComparison, {
+            type: 'bar',
+            data: {
+                labels: ['MCB', 'RCCB', 'RCBO'],
+                datasets: [{
+                    label: 'Chống Quá Tải',
+                    data: [1, 0, 1],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Chống Ngắn Mạch',
+                    data: [1, 0, 1],
+                    backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Chống Dòng Rò (Chống Giật)',
+                    data: [0, 1, 1],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value === 1 ? 'Có' : (value === 0 ? 'Không' : '');
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Khả Năng Bảo Vệ',
+                        font: { size: 16 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y === 1 ? 'Có' : 'Không';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const ctxRcboType = document.getElementById('rcboTypeChart').getContext('2d');
+        new Chart(ctxRcboType, {
+            type: 'bar',
+            data: {
+                labels: ['Type AC', 'Type A', 'Type F', 'Type B'],
+                datasets: [{
+                    label: 'Dòng rò xoay chiều (AC)',
+                    data: [1, 1, 1, 1],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                }, {
+                    label: 'Dòng rò một chiều xung (Pulsating DC)',
+                    data: [0, 1, 1, 1],
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                }, {
+                    label: 'Dòng rò hỗn hợp tần số',
+                    data: [0, 0, 1, 1],
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                }, {
+                    label: 'Dòng rò một chiều mịn (Smooth DC)',
+                    data: [0, 0, 0, 1],
+                    backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: false },
+                    y: {
+                        stacked: false,
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) { return value === 1 ? 'Phát hiện' : (value === 0 ? 'Không' : ''); }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Khả Năng Phát Hiện Dòng Rò Của Các Loại RCBO',
+                        font: { size: 16 }
+                    },
+                     tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y === 1 ? 'Phát hiện' : 'Không phát hiện';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Recommendation Tool
+        const protectionTargetSelect = document.getElementById('protectionTarget');
+        const applianceTypeDiv = document.getElementById('applianceTypeDiv');
+        const applianceTypeSelect = document.getElementById('applianceType');
+        const getRecommendationButton = document.getElementById('getRecommendation');
+        const recommendationResultDiv = document.getElementById('recommendationResult');
+
+        protectionTargetSelect.addEventListener('change', () => {
+            if (protectionTargetSelect.value === 'sensitive_appliance') {
+                applianceTypeDiv.classList.remove('hidden');
+            } else {
+                applianceTypeDiv.classList.add('hidden');
+            }
+        });
+
+        getRecommendationButton.addEventListener('click', () => {
+            const target = protectionTargetSelect.value;
+            const appliance = applianceTypeSelect.value;
+            let rec = { In: "Tính toán theo tổng công suất tải + 30%", deltaN: "30mA", type: "Type A", poles: "1P+N hoặc 2P", curve: "Type C", icu: "4.5kA - 6kA" };
+
+            if (!target) {
+                recommendationResultDiv.classList.add('hidden');
+                alert("Vui lòng chọn mục tiêu bảo vệ.");
+                return;
+            }
+
+            switch (target) {
+                case "whole_house":
+                    rec.In = "40A - 63A (tùy quy mô nhà)";
+                    rec.poles = "Nên dùng 2P";
+                    break;
+                case "floor":
+                    rec.In = "32A - 50A (tùy số phòng/thiết bị)";
+                    break;
+                case "wet_area":
+                    rec.deltaN = "10mA (ưu tiên) hoặc 30mA";
+                    rec.In = "16A - 25A (tùy thiết bị)";
+                    break;
+                case "sensitive_appliance":
+                    if (!appliance) {
+                         alert("Vui lòng chọn loại thiết bị cụ thể.");
+                         recommendationResultDiv.classList.add('hidden');
+                         return;
+                    }
+                    switch (appliance) {
+                        case "water_heater":
+                            rec.In = "16A - 25A";
+                            rec.deltaN = "10mA hoặc 30mA";
+                            break;
+                        case "air_conditioner":
+                            rec.In = "16A - 32A (tùy BTU)";
+                            if (applianceTypeSelect.options[applianceTypeSelect.selectedIndex].text.toLowerCase().includes("inverter")) {
+                                rec.type = "Type A hoặc Type F";
+                            }
+                            break;
+                        case "induction_cooker":
+                            rec.In = "16A - 32A (tùy công suất bếp)";
+                            break;
+                        case "washing_machine_inverter":
+                             rec.In = "10A - 16A";
+                             rec.type = "Type A hoặc Type F";
+                             break;
+                    }
+                    break;
+                case "electronics_heavy":
+                    rec.type = "Type A (tối thiểu), cân nhắc Type F cho thiết bị inverter";
+                    break;
+                case "ev_charger":
+                    rec.type = "Type A (cho bộ sạc tích hợp bảo vệ DC) hoặc Type B";
+                    rec.deltaN = "30mA";
+                    rec.In = "Tính theo công suất bộ sạc (ví dụ: 32A cho 7kW)";
+                    rec.poles = "Nên dùng 2P";
+                    break;
+            }
+
+            document.getElementById('recIn').innerHTML = `<strong>Dòng điện định mức (In):</strong> ${rec.In}`;
+            document.getElementById('recDeltaN').innerHTML = `<strong>Dòng rò (IΔn):</strong> ${rec.deltaN}`;
+            document.getElementById('recType').innerHTML = `<strong>Loại RCBO (Type):</strong> ${rec.type}`;
+            document.getElementById('recPoles').innerHTML = `<strong>Số cực:</strong> ${rec.poles}`;
+            document.getElementById('recCurve').innerHTML = `<strong>Đường cong:</strong> ${rec.curve}`;
+            document.getElementById('recIcu').innerHTML = `<strong>Khả năng cắt ngắn mạch (Icu):</strong> ${rec.icu}`;
+            
+            recommendationResultDiv.classList.remove('hidden');
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('header nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    // Offset for sticky header if you have one
+                    const headerOffset = document.querySelector('header').offsetHeight;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
