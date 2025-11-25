@@ -196,9 +196,7 @@
                 <span class="discounted-price">${item.price}</span>
               </p>
               <div class="product-buttons">
-				<a href="${detailUTMLink}" target="_blank">
-                  <button class="buy-button xem-chi-tiet">Xem website</button>
-                </a>
+				
                 <a href="${utmLink}" target="_blank">
                   <button class="buy-button mua-shopee">Xem Shopee</button>
                 </a>
@@ -212,13 +210,7 @@
               value: 1
             });
           });
-          card.querySelector(".xem-chi-tiet").addEventListener("click", function () {
-            gtag('event', 'click_xem_chi_tiet', {
-              event_category: 'button',
-              event_label: item.name,
-              value: 1
-            });
-          });
+          
           container.appendChild(card);
         });
 
